@@ -1,3 +1,6 @@
+// TO DO:
+// Play around with syscall.CLONE_CGROUP and syscall.CLONE_NEWUSER (permissions issues? Try man cgroup_namespaces)
+
 package main
 
 import (
@@ -14,7 +17,7 @@ func main() {
 	case "child":
 		child()
 	default:
-		panic("wat should I do")
+		panic("Please use the run or child argument followed by the command to run.")
 	}
 }
 
@@ -24,7 +27,8 @@ func parent() {
 	// This holds the cloneflags which  will be passed to the clone syscall that gets called during cmd.Run()
 	// The clone syscall creates a new process
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+		// man clone - for more clone flags.
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS | syscall.CLONE_NEWIPC | syscall.CLONE_NEWNET,
 	}
 
 	cmd.Stdin = os.Stdin
@@ -46,7 +50,7 @@ func child() {
 	// then cp -R /var/lib/docker/overlay2/<layer> /home/rootfs should do the trick
     must(syscall.Chroot("/home/rootfs"))
 	must(os.Chdir("/"))
-	must(syscall.Mount("proc", "proc", "proc", 0 ""))
+	must(syscall.Mount("proc", "proc", "proc", 0, ""))
 	must(cmd.Run())
 }
 
