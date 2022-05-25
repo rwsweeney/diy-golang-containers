@@ -48,7 +48,7 @@ func child() {
 
 	// In order for this to work you'll need to create the rootfs folder and copy a file system there. Docker pull ubuntu
 	// then cp -R /var/lib/docker/overlay2/<layer> /home/rootfs should do the trick
-    must(syscall.Chroot("/home/rootfs"))
+        must(syscall.Chroot("/home/rootfs"))
 	must(os.Chdir("/"))
 	must(syscall.Mount("proc", "proc", "proc", 0, ""))
 	must(cmd.Run())
